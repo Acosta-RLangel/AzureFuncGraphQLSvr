@@ -6,27 +6,44 @@ const filter = require("lodash/filter");
 //#region type_defs
 const typeDefs = `
   type Book {
+    "The ID of the book in THIS system"
     id: Int!
+    "The Title of the book."
     title: String!,
+    "The person(s) who wrote the book."
     author: Author
   }
 
   type Author{
+      "The ID of the Author in THIS system."
       id:Int!, 
+      "The Author's last name."
       lastname:String!,
+      "The author's first name."
       firstname:String!,
+      "The author's full name.  This has been split into the firstname and lastname fields and will be removed in the short term future."
+      fullname: String @deprecated(reason: "use lastname, firstname" )
+      "The list of books by this author in this system."
       books:[Book]
-  }
 
+  }
+  "Queries retrieve data from the system."
   type Query {
+    "Get the list of books in the system."
     books: [Book],
+    "Get a book by its ID."
     booksByID(id: Int!): Book,
+    "Get the list of authors in this system."
     authors: [Author],
+    "Get an author by its ID"
     authorsByID(id:Int!):[Author],
+    "Get the authors with the last name of <lastname>"
     authorsByLastname(lastname:String!):[Author],
+    "Get the authors with the First name of <firstname> and last name of <lastname>."
     authorsByName(firstname:String!,lastname:String!):[Author]
     
   }
+
 `;
 
 //#endregion
@@ -83,6 +100,7 @@ const resolvers = {
 
   Author: {
     books: author => filter(books, { authorId: author.id }),
+    fullname: author => author.firstname + " " + author.lastname,
   },
   
   Book: {
